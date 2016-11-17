@@ -51,21 +51,23 @@ for(int mot = 1; mot < nbmots; mot++){
 	char * mfcName = (char *)malloc(256 * sizeof(char));
 	strcpy(mfcName, nomF);
 	nameWavToMfc(nomF, mfcName);
-	FILE ** audioFile = malloc(sizeof(FILE));
-	wavfile * pHeader = malloc(sizeof(wavfile));
+	FILE ** audioFile =(FILE**) malloc(sizeof(FILE));
+	wavfile * pHeader =(wavfile*) malloc(sizeof(wavfile));
 	wavRead(audioFile, nomF, pHeader);
 	int i = 0;
-	int16_t *buffer = malloc(sizeof(int16_t));
-	int16_t *matrice = malloc(sizeof(pHeader->totallength));
+	char *buffer = (char *)malloc(sizeof(int16_t));
+	int16_t *matrice = (int16_t *)malloc(sizeof(pHeader->totallength));
+	int16_t buf;
 	while(fread(buffer,sizeof(int16_t),1,*audioFile)>0) {
-		matrice[i++] = buffer;
+		buf = strtoul(buffer,NULL,0);
+		matrice[i++] = buf;
 	}
-	int16_t ** xFiltre = malloc(sizeof(float));
-	int * newLength = malloc(sizeof(int));
+	int16_t ** xFiltre = (int16_t **)malloc(sizeof(float));
+	int * newLength = (int *) malloc(sizeof(int));
 	float threshold = 0.7;
 	removeSilence(matrice, pHeader->frequency, xFiltre, newLength, threshold);
-	float ** X_mfcc = malloc(sizeof(float));
-	int * length_xmfcc = malloc(sizeof(int));
+	float ** X_mfcc = (float **)malloc(sizeof(float));
+	int * length_xmfcc = (int *) malloc(sizeof(int));
 	computeMFCC(X_mfcc, length_xmfcc, *xFiltre,
 			pHeader->totallength, pHeader->frequency, 512, 256, 12, 26);
 
