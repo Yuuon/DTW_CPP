@@ -51,9 +51,26 @@ for(int mot = 1; mot < nbmots; mot++){
 	char * mfcName = (char *)malloc(256 * sizeof(char));
 	strcpy(mfcName, nomF);
 	nameWavToMfc(nomF, mfcName);
-	FILE **audioFile;
-	wavfile * pHeader;
+	FILE ** audioFile = malloc(sizeof(FILE));
+	wavfile * pHeader = malloc(sizeof(wavfile));
 	wavRead(audioFile, nomF, pHeader);
+	int i = 0;
+	int16_t *buffer = malloc(sizeof(int16_t));
+	int16_t *matrice = malloc(sizeof(pHeader->totallength));
+	while(fread(buffer,sizeof(int16_t),1,*audioFile)>0) {
+		matrice[i++] = buffer;
+	}
+	int16_t ** xFiltre = malloc(sizeof(float));
+	int * newLength = malloc(sizeof(int));
+	float threshold = 0.7;
+	removeSilence(matrice, pHeader->frequency, xFiltre, newLength, threshold);
+	float ** X_mfcc = malloc(sizeof(float));
+	int * length_xmfcc = malloc(sizeof(int));
+	computeMFCC(X_mfcc, length_xmfcc, *xFiltre,
+			pHeader->totallength, pHeader->frequency, 512, 256, 12, 26);
+
+
+
 	/*
 	 * TODO:
 	 * il faut faire une lecteure sur le fichier ouvert par WavRead
