@@ -29,10 +29,10 @@ using namespace std;
 
 float distance(float * c_k, float* c_unk, int i, int j) {
 	float d = 0;
-	//for(int k = 0; k < 12; k++) {
-    d += pow( (c_k[i]-c_unk[j]) ,2 );
+	for(int k = 0; k < 12; k++) {
+    d += pow( (c_k[k][i]-c_unk[k][j]) ,2 );
 
-	//}
+	}
 	return d;
 }
 
@@ -42,7 +42,7 @@ float dtw(int n_ck, int n_cunk, int dim_mfcc, float* c_k, float* c_unk) {
     int w0 = 1;
     int w1 = 2;
     int w2 = 1;
-    double r = min(n_ck, n_cunk)|2 + 1;
+    double r = (min(n_ck, n_cunk)|2) + 1;
     double table[n_ck][n_cunk];
     double d;
     table[0][0] = 0.0;
