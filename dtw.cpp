@@ -27,9 +27,9 @@ using namespace std;
 *  @return Distance between the two signals
 */
 
-float distance(float * c_k, float* c_unk, int i, int j) {
+float distance(float ** c_k, float** c_unk, int i, int j, int dim_mfcc) {
 	float d = 0;
-	for(int k = 0; k < 12; k++) {
+	for(int k = 0; k < dim_mfcc; k++) {
     d += pow( (c_k[k][i]-c_unk[k][j]) ,2 );
 
 	}
@@ -46,6 +46,8 @@ float dtw(int n_ck, int n_cunk, int dim_mfcc, float* c_k, float* c_unk) {
     double table[n_ck][n_cunk];
     double d;
     table[0][0] = 0.0;
+    float ** matrice_k = (float **)malloc(sizeof(dim_mfcc) * sizeof(n_ck));
+    float ** matrice_unk = (float **)malloc(sizeof(dim_mfcc) * sizeof(n_ck));
     for(int i = 1; i < n_cunk + 1; i++ ) {
         table[0][i] = numeric_limits<double>::infinity();
         
@@ -56,9 +58,9 @@ float dtw(int n_ck, int n_cunk, int dim_mfcc, float* c_k, float* c_unk) {
     for(int i = 1; i < n_ck + 1; i++ ) {
     	for(int j = 1; j< n_cunk + 1; j++) {
     		if(abs(i-j) <= r){
-    			float d1 = table[i-1][j] + w0 * distance(c_k, c_unk, i-1, j-1);
-    			float d2 = table[i-1][j-1] + w1 * distance(c_k, c_unk, i-1,j-1);
-    			float d3 = table[i][j-1] + w2 * distance(c_k,c_unk,i-1,j-1);
+    			float d1 = table[i-1][j] + w0 * distance(matrice_k, matrice_unk, i-1, j-1, dim_mfcc);
+    			float d2 = table[i-1][j-1] + w1 * distance(matrice_k, matrice_unk, i-1,j-1, dim_mfcc);
+    			float d3 = table[i][j-1] + w2 * distance(matrice_k, matrice_unk,i-1,j-1, dim_mfcc);
     			table[i][j] = min(d1, min(d2,d3));
     		} else {
     			table[i][j] = numeric_limits<double>::infinity();

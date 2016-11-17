@@ -55,9 +55,8 @@ string chemin = "";
 
 int nbmots = vocabulaire.size();
 const char *nomFichier;
-char *ref; 
 string fichier; 
-float table [9] ;
+float table[9] ;
 int n_ck, n_cunk, dim_mfcc;
 float * c_k;
 float * c_unk;
@@ -84,7 +83,11 @@ for(int mot = 0; mot < nbmots; mot++){
 	c_k = *X_mfcc;
 
 	table[mot] = dtw(n_ck, n_cunk, dim_mfcc, c_k, c_unk);
+
+	printf("%f  ",table[mot]);
 }
+
+
 
 
 
