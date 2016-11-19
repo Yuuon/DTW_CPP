@@ -15,8 +15,11 @@
 using namespace std;
 
 void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
-	FILE ** audioFile =(FILE**) malloc(sizeof(FILE));
-	wavfile * pHeader =(wavfile*) malloc(sizeof(wavfile));
+	FILE * fp = fopen(nomF,"r");
+	fseek(fp, 0, SEEK_END);
+	int sz = ftell(fp);
+	FILE ** audioFile =(FILE**) malloc(sizeof(sz));
+	wavfile * pHeader =(wavfile*) malloc(sizeof(44));
 	wavRead(audioFile, nomF, pHeader);
 	int i = 0;
 	char *buffer = (char *)malloc(sizeof(int16_t));
@@ -41,7 +44,6 @@ int main(){
 vector<string> vocabulaire;
 vocabulaire.push_back("avance");
 vocabulaire.push_back("recule");
-vocabulaire.push_back("decollage");
 vocabulaire.push_back("droite");
 vocabulaire.push_back("gauche");
 vocabulaire.push_back("tournedroite");
@@ -65,17 +67,18 @@ int * length_xmfcc_ref = (int *) malloc(sizeof(int));
 fichier = chemin + "ref.wav";
 char * nomF_ref = strdup(fichier.c_str());
 dim_mfcc = 12;
+
 parametration(nomF_ref,X_mfcc_ref,length_xmfcc_ref);
 n_cunk = *length_xmfcc_ref;
 c_unk = *X_mfcc_ref;
-/*lecture des fichiers audio*/
+
 for(int mot = 0; mot < nbmots; mot++){
 	fichier = chemin + vocabulaire[mot] + ".wav";
 	nomFichier = fichier.c_str();
 	char * nomF = strdup(nomFichier);
-	char * mfcName = (char *)malloc(256 * sizeof(char));
-	strcpy(mfcName, nomF);
-	nameWavToMfc(nomF, mfcName);
+	//char * mfcName = (char *)malloc(256 * sizeof(char));
+	//strcpy(mfcName, nomF);
+	//nameWavToMfc(nomF, mfcName);
 	float ** X_mfcc = (float **)malloc(sizeof(float));
 	int * length_xmfcc = (int *) malloc(sizeof(int));
 	parametration(nomF,X_mfcc,length_xmfcc);
@@ -85,6 +88,9 @@ for(int mot = 0; mot < nbmots; mot++){
 	table[mot] = dtw(n_ck, n_cunk, dim_mfcc, c_k, c_unk);
 
 	printf("%f  ",table[mot]);
+
+
+
 }
 
 
