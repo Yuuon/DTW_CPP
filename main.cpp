@@ -19,8 +19,8 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 	//fseek(fp, 0, SEEK_END);
 	//int sz = ftell(fp);
 	//FILE ** audioFile =(FILE**) malloc(sizeof(sz));
-	wavfile * pHeader =(wavfile*) malloc(44);
-	char *buffer = (char *)malloc(sizeof(char)*2);
+	wavfile * pHeader =(wavfile*) malloc(sizeof(wavfile));
+	//char *buffer = (char *)malloc(sizeof(char)*2);
 	//int16_t *matrice = (int16_t *)malloc(sizeof(pHeader->bytes_in_data));
 	int16_t matrice[pHeader->bytes_in_data];
 	int16_t buf;
@@ -30,7 +30,7 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 	//wavRead(audioFile, nomF, pHeader);
 	int i = 0;
 
-	//memcpy(matrice, audioFile, pHeader->bytes_in_data);
+
 	if (fp == NULL) {
 			fprintf(stderr, "Can't open input file %s\n", nomF);
 			exit(1);
@@ -39,6 +39,11 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 		// read header
 		if (fread(pHeader, sizeof(wavfile), 1, fp) < 1) {
 			fprintf(stderr, "Can't read input file header %s\n", nomF);
+			exit(1);
+		}
+
+		if (fread(matrice, sizeof(pHeader->bytes_in_data), 1, fp) < 1) {
+			fprintf(stderr, "Can't read signal matrice %s\n", nomF);
 			exit(1);
 		}
 
@@ -75,15 +80,6 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 
 
 
-
-
-
-
-	while(fread(buffer,sizeof(char)*2,1,fp)>0) {
-		buf = strtoul(buffer,NULL,0);
-		matrice[i++] = buf;
-	}
-
 	removeSilence(matrice, pHeader->bytes_in_data, xFiltre, newLength, threshold);
 	/*
 	computeMFCC(X_mfcc, length_xmfcc, *xFiltre,
@@ -91,7 +87,7 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 */
 	//free(*audioFile);
 	free(pHeader);
-	free(buffer);
+	//free(buffer);
 	//free(matrice);
 	free(*xFiltre);
 	free(newLength);
