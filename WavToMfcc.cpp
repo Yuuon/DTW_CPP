@@ -17,7 +17,7 @@
 #include <string.h> // for memcmp
 #include <stdint.h> // for int16_t and int32_t
 #include <math.h>
-#include <iostream>
+#include <fstream>
 #include "libmfccOptim.h"
 #include "FFTReal.h"
 #include "WavToMfcc.h"
