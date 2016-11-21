@@ -27,11 +27,14 @@ using namespace std;
 *  @return Distance between the two signals
 */
 
-float distance(float ** c_k, float** c_unk, int i, int j, int dim_mfcc) {
+float distance(float * c_k, float* c_unk, int i, int j, int dim_mfcc) {
 	float d = 0;
 	for(int k = 0; k < dim_mfcc; k++) {
-    d += pow( (c_k[k][i]-c_unk[k][j]) ,2 );
-
+		if(k == 0) {
+			d += pow( (c_k[i]-c_unk[j]) ,2 );
+		} else {
+			d += pow( (c_k[k * i]-c_unk[k * j]) ,2 );
+		}
 	}
 	return d;
 }
@@ -42,32 +45,33 @@ float dtw(int n_ck, int n_cunk, int dim_mfcc, float* c_k, float* c_unk) {
     int w0 = 1;
     int w1 = 2;
     int w2 = 1;
-    double r = (min(n_ck, n_cunk)|2) + 1;
-    double table[n_ck][n_cunk];
-    double d;
+    int r = (min(n_ck, n_cunk)/2) + 1;
+    int a = n_ck;
+    int b = n_cunk;
+    float table[a+1][b+1];
+    float d;
     table[0][0] = 0.0;
-    float ** matrice_k = (float **)malloc(sizeof(dim_mfcc) * sizeof(n_ck));
-    float ** matrice_unk = (float **)malloc(sizeof(dim_mfcc) * sizeof(n_ck));
-    for(int i = 1; i < n_cunk + 1; i++ ) {
-        table[0][i] = numeric_limits<double>::infinity();
+    for(int i = 1; i < b + 1; i++ ) {
+        table[0][i] = numeric_limits<float>::infinity();
         
     }
-    for(int i = 1; i < n_ck + 1; i++) {
-    	table[i][0] = numeric_limits<double>::infinity();
+    for(int i = 1; i < a + 1; i++) {
+    	table[i][0] = numeric_limits<float>::infinity();
     }
-    for(int i = 1; i < n_ck + 1; i++ ) {
-    	for(int j = 1; j< n_cunk + 1; j++) {
+    float d1,d2,d3;
+    for(int i = 1; i < a + 1; i++ ) {
+    	for(int j = 1; j< b + 1; j++) {
     		if(abs(i-j) <= r){
-    			float d1 = table[i-1][j] + w0 * distance(matrice_k, matrice_unk, i-1, j-1, dim_mfcc);
-    			float d2 = table[i-1][j-1] + w1 * distance(matrice_k, matrice_unk, i-1,j-1, dim_mfcc);
-    			float d3 = table[i][j-1] + w2 * distance(matrice_k, matrice_unk,i-1,j-1, dim_mfcc);
+    			d1 = table[i-1][j] + w0 * distance(c_k, c_unk, i-1, j-1, dim_mfcc);
+    			d2 = table[i-1][j-1] + w1 * distance(c_k, c_unk, i-1,j-1, dim_mfcc);
+    			d3 = table[i][j-1] + w2 * distance(c_k, c_unk,i-1,j-1, dim_mfcc);
     			table[i][j] = min(d1, min(d2,d3));
     		} else {
-    			table[i][j] = numeric_limits<double>::infinity();
+    			table[i][j] = numeric_limits<float>::infinity();
     		}
     	}
     }
-    d = table[n_ck][n_cunk]/(n_ck+n_cunk);
+    d = table[a][b]/(a + b);
     return d;
 }
 

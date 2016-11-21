@@ -22,13 +22,13 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 	wavfile * pHeader =(wavfile*) malloc(sizeof(wavfile));
 	//char *buffer = (char *)malloc(sizeof(char)*2);
 	//int16_t *matrice = (int16_t *)malloc(sizeof(pHeader->bytes_in_data));
-	int16_t matrice[pHeader->bytes_in_data];
-	int16_t buf;
-	int16_t ** xFiltre = (int16_t **)malloc(2);
+	int16_t *matrice = new int16_t[pHeader->bytes_in_data];
+
+	int16_t ** xFiltre = (int16_t **)malloc(sizeof(int16_t));
 	int * newLength = (int *) malloc(sizeof(int));
 	float threshold = 0.7;
 	//wavRead(audioFile, nomF, pHeader);
-	int i = 0;
+
 
 
 	if (fp == NULL) {
@@ -78,17 +78,15 @@ void parametration(char * nomF, float ** X_mfcc, int * length_xmfcc) {
 		}
 
 
+	removeSilence(matrice, (pHeader->bytes_in_data)/8, xFiltre, newLength, threshold);
 
-
-	removeSilence(matrice, pHeader->bytes_in_data, xFiltre, newLength, threshold);
-	/*
 	computeMFCC(X_mfcc, length_xmfcc, *xFiltre,
-				pHeader->bytes_in_data, pHeader->frequency, 512, 256, 12, 26);
-*/
+				*newLength, pHeader->frequency, 512, 256, 12, 26);
+
 	//free(*audioFile);
 	free(pHeader);
 	//free(buffer);
-	//free(matrice);
+	free(matrice);
 	free(*xFiltre);
 	free(newLength);
 	fclose(fp);
@@ -103,56 +101,55 @@ vocabulaire.push_back("avance");
 vocabulaire.push_back("recule");
 vocabulaire.push_back("droite");
 vocabulaire.push_back("gauche");
-vocabulaire.push_back("tournedroite");
-vocabulaire.push_back("tournegauche");
-vocabulaire.push_back("faisunflip");
-vocabulaire.push_back("arretetoi");
-vocabulaire.push_back("etatdurgence");
+vocabulaire.push_back("tourne_droite");
+vocabulaire.push_back("tourne_gauche");
+vocabulaire.push_back("fais_flip");
+vocabulaire.push_back("arrete_toi");
+vocabulaire.push_back("etat_urgence");
 
 
 string chemin = "";
 
 int nbmots = vocabulaire.size();
-const char *nomFichier;
 string fichier; 
 float table[9] ;
-int n_ck, n_cunk, dim_mfcc;
-float * c_k = (float *)malloc(sizeof(float));
-float * c_unk = (float *)malloc(sizeof(float));
+
+int dim_mfcc = 12;
+
+
 float ** X_mfcc_ref = (float **)malloc(sizeof(float));
 int * length_xmfcc_ref = (int *) malloc(sizeof(int));
 fichier = chemin + "ref.wav";
 char * nomF_ref = strdup(fichier.c_str());
-dim_mfcc = 12;
 
 parametration(nomF_ref,X_mfcc_ref,length_xmfcc_ref);
-n_cunk = *length_xmfcc_ref;
-c_unk = *X_mfcc_ref;
-/*
+
+
+
+
 for(int mot = 0; mot < nbmots; mot++){
 	fichier = chemin + vocabulaire[mot] + ".wav";
-	nomFichier = fichier.c_str();
-	char * nomF = strdup(nomFichier);
+	char * nomF = strdup(fichier.c_str());
 	//char * mfcName = (char *)malloc(256 * sizeof(char));
 	//strcpy(mfcName, nomF);
 	//nameWavToMfc(nomF, mfcName);
 	float ** X_mfcc = (float **)malloc(sizeof(float));
 	int * length_xmfcc = (int *) malloc(sizeof(int));
-	parametration(nomF,X_mfcc,length_xmfcc);
-	n_ck = *length_xmfcc;
-	c_k = *X_mfcc;
 
-	table[mot] = dtw(n_ck, n_cunk, dim_mfcc, c_k, c_unk);
+	parametration(nomF,X_mfcc,length_xmfcc);
+
+
+	table[mot] = dtw(*length_xmfcc, *length_xmfcc_ref, dim_mfcc, *X_mfcc, *X_mfcc_ref);
 
 	printf("%f  ",table[mot]);
 
+	free(X_mfcc);
+	free(length_xmfcc);
 
 
 }
-*/
 
-//free(c_k);
-//free(c_unk);
+
 free(X_mfcc_ref);
 free(length_xmfcc_ref);
 free(nomF_ref);
